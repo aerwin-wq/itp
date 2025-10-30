@@ -17,7 +17,7 @@ My midterm submission with all four phases. Each phase has code and some notes.
 
 ![Phase 1](Phase1.jpg)
 
-Started with a hand-drawn sketch. It's got an ellipse for the ring part, a long handle line, and a diagonal line crossign through the ellipse.
+Started with a sketch i made with Canva. It's got an ellipse for the ring part, a long handle line, and a diagonal line crossign through the ellipse.
 
 ---
 
