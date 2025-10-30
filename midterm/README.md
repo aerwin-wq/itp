@@ -13,7 +13,7 @@ My midterm submission with all four phases. Each phase has code and some notes.
 
 ---
 
-## Phase 1 — Hand Sketch
+## Phase 1 — Digital Sketch
 
 ![Phase 1](Phase1.jpg)
 
