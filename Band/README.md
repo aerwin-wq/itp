@@ -350,7 +350,7 @@ This project is open source and available for educational purposes.
 This website was a collaborative effort between all band members, combining creative vision with technical implementation.
 
 #### Content & Creative Direction
-**Isaac, Ryan, and Arlo** contributed:
+**Isaac and Ryan contributed:
 - **Band Biographies**: Wrote individual member bios highlighting their musical backgrounds and influences
 - **Text Content**: Created all written content including band description, project descriptions, and contact information
 - **Asset Selection**: Chose and curated all images and GIFs used throughout the site
@@ -359,7 +359,7 @@ This website was a collaborative effort between all band members, combining crea
   - Provided creative direction on visual aesthetic
 
 #### Technical Implementation
-**Developer** (me) handled:
+**Developer** (Arlo) handled:
 - **Site Architecture**: Built Jekyll structure and page layout
 - **CSS Styling**: Implemented all visual effects, animations, and responsive design
   - Created "fried" background filters
@@ -377,12 +377,12 @@ This website was a collaborative effort between all band members, combining crea
 
 | Area | Contributors | Responsibilities |
 |------|--------------|------------------|
-| **Content Writing** | Isaac, Ryan, Arlo | Bios, descriptions, project info |
-| **Visual Assets** | Isaac, Ryan, Arlo | Image selection, GIF curation |
-| **Design Direction** | Isaac, Ryan, Arlo | Color schemes, overall aesthetic |
-| **HTML/CSS** | Developer | Structure, styling, animations |
-| **JavaScript** | Developer | Parallax effects, interactivity |
-| **Deployment** | Developer | Hosting, configuration, optimization |
+| **Content Writing** | Isaac, Ryan | Bios, descriptions, project info |
+| **Visual Assets** | Isaac, Ryan | Image selection, GIF curation |
+| **Design Direction** | Isaac Ryan | Color schemes, overall aesthetic |
+| **HTML/CSS** | Arlo | Structure, styling, animations |
+| **JavaScript** | Arlo | Parallax effects, interactivity |
+| **Deployment** | Arlo | Hosting, configuration, optimization |
 
 This collaborative approach allowed us to create a website that authentically represents ITPP's creative vision while utilizing advanced web technologies for maximum visual impact.
 
