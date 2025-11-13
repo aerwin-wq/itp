@@ -629,5 +629,3 @@ just understanding of core CSS and JavaScript APIs!
 
 ---
 
-**Last Updated**: November 2025
-**Built with**: ❤️, way too many CSS animations, and helpful AI assistance
