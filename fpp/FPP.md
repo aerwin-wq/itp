@@ -1,71 +1,169 @@
+
 # **Harmony Atlas — Final Project Proposal**
 
 ## **Title**
 **Harmony Atlas: A Searchable Database of Chord Progressions and Harmony Types**
 
 ## **1-Sentence Overview**
-A searchable digital database that categorizes musical excerpts by harmony type (e.g., modal interchange, secondary dominants, chromatic mediants) using sourced scores and automatically transcribed MIDI.
+A web-based database that organizes musical excerpts by harmony type (modal interchange, secondary dominants, chromatic mediants, etc.), using MuseScore scores and Basic Pitch–generated MIDI. The frontend is built in JavaScript, the backend in Python, and the full project is hosted on Hugging Face Spaces.
 
 ---
 
-## **Resources (3 Specific Hyperlinked Sources)**
-
+## **Resources (3 Hyperlinked Sources)**  
 - **MuseScore Score Library** — https://musescore.com/sheetmusic  
 - **Basic Pitch (Spotify)** — https://basicpitch.spotify.com/  
-- **Open Studio Music Analysis Channel** — https://www.youtube.com/openstudiojazz
+- **Open Studio Music Analysis Channel** — https://www.youtube.com/openstudiojazz  
+
 ---
 
 ## **Project Overview**
-*Harmony Atlas* will be a small but functional web-based database of musical excerpts sorted by harmony type. I will gather musical examples from MuseScore downloads and Basic Pitch transcriptions of YouTube audio. Each excerpt will be labeled with harmonic tags such as modal interchange, secondary dominant, chromatic mediant, extended chord structures, and other common harmony types. The database will let users browse or search excerpts based on harmonic function rather than composer or genre. Each entry will include a score image, metadata, and optional MIDI playback. The project will serve as a learning tool and a prototype for a larger educational resource.
+*Harmony Atlas* is a small but functional web platform that allows users to browse musical excerpts based on their harmonic function, rather than composer or genre. The project consists of three major components:
+
+### **Frontend — JavaScript UI (Hugging Face Spaces — Static Space)**
+- Designed using HTML, CSS, and JavaScript.  
+- Provides:
+  - A searchable list of excerpts  
+  - Dropdown filter by harmony type  
+  - Score image viewer  
+  - Metadata display  
+  - Optional MIDI/audio playback  
+- Uses `fetch()` to request excerpt metadata from the Python backend API.
+- Clean, responsive UI using simple CSS and JS DOM rendering.
+
+Example fetch:
+```js
+const data = await fetch('https://harmony-backend.hf.space/api/excerpts')
+  .then(res => res.json());
+```
+
+### **Backend — Python API (Hugging Face Spaces — Python Space)**
+The backend handles all data organization and exposes the dataset through REST endpoints. It includes:
+
+A Python (FastAPI or Flask) server with routes like:
+- `/api/excerpts`
+- `/api/excerpt/<id>`
+- `/api/search?harmony_type=secondary dominant`
+
+A structured dataset containing:
+- `scores/` — PNG/PDF score snippets
+- `midi/` — short MIDI files
+- `excerpts.json` — metadata for every entry
+
+Backend logic written entirely in Python:
+- Basic Pitch transcription
+- MIDI file cleanup
+- Data parsing, formatting, and storage
+
+**Basic Pitch Integration (Python):**
+```python
+from basic_pitch.inference import predict
+
+predict(
+    audio_file="input.wav",
+    output_directory="output_midi/"
+)
+```
+
+All preprocessing (downloading scores, transcribing audio, slicing excerpts, tagging harmony types) is done via Python scripts before populating the database.
+
+### **Dataset Schema**
+Every entry in the database follows this structure:
+
+```json
+{
+  "id": "unique_id",
+  "title": "Prelude in E Minor",
+  "composer": "Chopin",
+  "source": "MuseScore",
+  "harmony_type": ["modal interchange", "borrowed iv chord"],
+  "score_image": "scores/prelude_em.png",
+  "midi": "midi/prelude_em.mid",
+  "notes": "Borrowed iv chord in measure 4."
+}
+```
+
+### **Technical Hosting Setup — Hugging Face Spaces**
+The project will use two Spaces:
+
+#### 1. Frontend Space (Static)
+Contains:
+- `index.html`
+- `style.css`
+- `app.js`
+- Pure client-side rendering using JS.
+
+#### 2. Backend Space (Python/Server app)
+Contains:
+- `app.py`
+- dataset folders (`/scores`, `/midi`, `/json`)
+- Basic Pitch installed in the environment
+- Public API consumed by the frontend Space.
+
+The frontend communicates with the backend using full HF URLs like:
+```
+https://harmony-atlas-backend.hf.space/api/excerpts
+```
 
 ---
 
 ## **Overlap With Other Work**
-Some harmonic analysis techniques overlap with my general coursework, but **no part of this project is being submitted for any other class**. This class is taught by **Professor Rachel**.
+The harmonic knowledge overlaps with general music coursework, but no part of this project is being submitted for any other class. This class is taught by Professor Rachel.
 
 ---
 
-## **GOOD Outcome (Minimum Guaranteed)**
-- A working database with at least **50 musical examples**, each correctly categorized by harmony type.
+## **Outcomes**
 
-## **BETTER Outcome (Expected Goal)**
-- A functional web interface with **search + filter** (by harmony type, composer, or source).  
-- **100–200 fully analyzed excerpts** with PDFs/PNGs of notation and accompanying MIDI playback.
+### **GOOD Outcome (Minimum Guaranteed)**
+- Working frontend + backend
+- At least 50 labeled excerpts
+- Functional search and harmony-type filtering
 
-## **BEST Outcome (Ideal Hope)**
-- A polished interface with **tag search, audio playback, score preview**, and **500+ harmony-labeled excerpts**.  
-- Optional: automatic detection suggestions based on Basic Pitch output.
+### **BETTER Outcome (Expected Goal)**
+- 100–200 excerpts
+- Score viewer + MIDI playback
+- Responsive, polished UI
+- Clean metadata formatting
+
+### **BEST Outcome (Ideal Hope)**
+- 500+ tagged excerpts
+- Advanced search and filtering
+- Optional simple chord-suggestion model using Basic Pitch MIDI + rule-based detection
+- Fully polished UX with smooth animations and zoomable score viewer
 
 ---
 
-## **Project Timeline (Calendar With Specific Dates)**
+## **Project Timeline (Calendar With Dates)**
 
 ### **Week 1 — Nov 15–Nov 21**
-- Finalize list of harmony categories.  
-- Create data schema (JSON/CSV): title, harmony type, score image, MIDI, notes.  
-- Select candidate musical pieces.  
-- Download some MuseScore scores and test workflow.
+- Finalize harmony categories
+- Build dataset schema (JSON/CSV)
+- Test downloading MuseScore scores
+- Test Python Basic Pitch transcription
+- Begin folder structure setup
 
 ### **Week 2 — Nov 22–Nov 28**
-- Transcribe more YouTube excerpts using Basic Pitch.  
-- Extract measures containing target harmonic events.  
-- Begin labeling examples manually.  
-- Build initial dataset folder structure.
+- Extract audio → MIDI using Python + Basic Pitch
+- Cut score images and assign harmony types
+- Populate initial dataset items
+- Write backend preprocessing scripts
+- Begin labeling 20–40 excerpts
 
 ### **Week 3 — Nov 29–Dec 5**
-- Build basic web interface:  
-  - search bar  
-  - dropdown filter by harmony type  
-  - display score images + metadata  
-- Insert at least 10 entries (**GOOD outcome checkpoint**).
+- Build JavaScript frontend:
+  - search bar
+  - category filter
+  - excerpt grid layout
+- Deploy prototype backend API on HF Spaces
+- Display first 10–20 items in UI
 
 ### **Week 4 — Dec 6–Dec 12**
-- Add more entries
-- Improve UI styling and metadata formatting.  
-- Add MIDI playback.
+- Expand database with more examples
+- Improve UI styling
+- Integrate MIDI playback
+- Add full metadata support
 
 ### **Final Week — Dec 13–Dec 18**
-- Polish interface, debug features.  
-- Add final examples  
-- Complete documentation and submit final project.
-
+- Final dataset polish
+- Debug all UI/API functions
+- Add last entries (GOOD/BETTER/BEST outcome)
+- Finalize README + submit project
