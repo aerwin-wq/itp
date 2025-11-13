@@ -1,7 +1,5 @@
 # ITPP Band Website
 
-https://aerwin-wq.github.io/
-
 A psychedelic, parallax-heavy website for the jazz fusion trio ITPP, hosted on GitHub Pages with Jekyll.
 
 ## 🚀 Hosting & Deployment
@@ -186,25 +184,6 @@ targetSection.scrollIntoView({
 });
 ```
 
-## 📁 File Structure
-
-```
-aerwin-wq.github.io/
-├── _config.yml                 # Jekyll configuration
-├── _layouts/
-│   └── default.html           # Custom Jekyll layout
-├── assets/
-│   ├── css/
-│   │   └── style.scss         # Main stylesheet (Sass)
-│   └── js/
-│       └── parallax.js        # Custom parallax engine
-├── index.md                   # Main content (Markdown + HTML)
-├── qav24tl.gif               # Fried background image
-├── rowleytransparent.gif     # Parallax layer image
-├── i-said-hey-he-man.gif     # Header image
-└── README.md                 # This file
-```
-
 ## 🎭 Key Technologies
 
 ### Core Stack
@@ -360,7 +339,52 @@ Add to `index.md` in parallax-container:
 
 This project is open source and available for educational purposes.
 
-## 👥 Credits
+## 👥 Collaboration & Credits
+
+### Team Contributions
+
+This website was a collaborative effort between all band members, combining creative vision with technical implementation.
+
+#### Content & Creative Direction
+**Isaac, Ryan, and Arlo** contributed:
+- **Band Biographies**: Wrote individual member bios highlighting their musical backgrounds and influences
+- **Text Content**: Created all written content including band description, project descriptions, and contact information
+- **Asset Selection**: Chose and curated all images and GIFs used throughout the site
+  - Selected the background GIF (`qav24tl.gif`)
+  - Chose parallax layer GIFs (`rowleytransparent.gif`, `i-said-hey-he-man.gif`)
+  - Provided creative direction on visual aesthetic
+
+#### Technical Implementation
+**Developer** (me) handled:
+- **Site Architecture**: Built Jekyll structure and page layout
+- **CSS Styling**: Implemented all visual effects, animations, and responsive design
+  - Created "fried" background filters
+  - Designed rainbow gradient headers
+  - Styled review cards and section layouts
+  - Applied unique typography per section
+- **JavaScript Development**: Built custom parallax engine from scratch
+  - Implemented 50-layer parallax system with sine wave motion
+  - Added mouse-follow and scroll-based parallax
+  - Created smooth scroll navigation
+- **Deployment**: Set up GitHub Pages hosting and Jekyll configuration
+- **Optimization**: Performance tuning and browser compatibility
+
+### Division of Labor
+
+| Area | Contributors | Responsibilities |
+|------|--------------|------------------|
+| **Content Writing** | Isaac, Ryan, Arlo | Bios, descriptions, project info |
+| **Visual Assets** | Isaac, Ryan, Arlo | Image selection, GIF curation |
+| **Design Direction** | Isaac, Ryan, Arlo | Color schemes, overall aesthetic |
+| **HTML/CSS** | Developer | Structure, styling, animations |
+| **JavaScript** | Developer | Parallax effects, interactivity |
+| **Deployment** | Developer | Hosting, configuration, optimization |
+
+This collaborative approach allowed us to create a website that authentically represents ITPP's creative vision while utilizing advanced web technologies for maximum visual impact.
+
+---
+
+### Credits
 
 **Band**: ITPP (Isaac, Ryan, Arlo)
 **Developer**: Built with Claude Code
@@ -369,5 +393,237 @@ This project is open source and available for educational purposes.
 
 ---
 
+## 🤖 Development Process - ChatGPT Assistance
+
+This project was built with assistance from ChatGPT to learn and implement advanced CSS and JavaScript techniques. Below are some of the key prompts and responses that helped shape this website.
+
+### Prompt 1: Custom Parallax Library
+
+**Me:**
+```
+How do I create a custom parallax effect in JavaScript without using external libraries?
+I want multiple layers moving at different speeds based on scroll position.
+```
+
+**ChatGPT:**
+```
+You can create a custom parallax effect using vanilla JavaScript and the requestAnimationFrame
+API for smooth 60fps performance. Here's a basic implementation:
+
+1. Select all parallax elements:
+   const layers = document.querySelectorAll('.parallax-layer');
+
+2. Listen for scroll events and calculate position:
+   window.addEventListener('scroll', () => {
+     const scrolled = window.pageYOffset;
+     layers.forEach(layer => {
+       const speed = layer.getAttribute('data-speed');
+       const yPos = -(scrolled * speed);
+       layer.style.transform = `translateY(${yPos}px)`;
+     });
+   });
+
+3. For optimization, use requestAnimationFrame:
+   let ticking = false;
+   window.addEventListener('scroll', () => {
+     if (!ticking) {
+       window.requestAnimationFrame(updateParallax);
+       ticking = true;
+     }
+   });
+
+This gives you full control over the parallax behavior without dependencies.
+```
+
+### Prompt 2: Advanced Transforms
+
+**Me:**
+```
+How can I make elements move in a sine wave pattern continuously,
+and also flip some of them randomly on the y-axis?
+```
+
+**ChatGPT:**
+```
+You can use Math.sin() and Math.cos() for sine wave motion, combined with CSS transforms:
+
+1. Create a continuous animation loop:
+   let time = 0;
+   function animate() {
+     time += 0.01;
+     elements.forEach(el => {
+       const frequency = parseFloat(el.dataset.frequency);
+       const phase = parseFloat(el.dataset.phase);
+
+       // Sine wave motion
+       const floatX = Math.sin(time * frequency + phase) * 30;
+       const floatY = Math.cos(time * frequency * 0.8 + phase) * 20;
+
+       // Random flip
+       const flip = el.dataset.flipped === '1' ? 'scaleY(-1)' : '';
+       el.style.transform = `translate(${floatX}px, ${floatY}px) ${flip}`;
+     });
+     requestAnimationFrame(animate);
+   }
+
+2. Initialize with random values:
+   elements.forEach(el => {
+     el.dataset.phase = Math.random() * Math.PI * 2;
+     el.dataset.frequency = 0.3 + Math.random() * 0.7;
+     el.dataset.flipped = Math.random() > 0.5 ? '1' : '0';
+   });
+
+The scaleY(-1) flips elements vertically. The random phase and frequency make each
+element move differently, creating organic motion.
+```
+
+### Prompt 3: CSS Filter Effects
+
+**Me:**
+```
+I want to make a background image look "deep fried" - super saturated,
+high contrast, with shifting colors. How do I do this with CSS filters?
+```
+
+**ChatGPT:**
+```
+You can chain multiple CSS filters together to create a "fried" effect:
+
+filter:
+  saturate(500%)      /* Extreme color boost */
+  contrast(200%)      /* High contrast */
+  hue-rotate(90deg)   /* Shift all colors */
+  brightness(150%)    /* Blow out highlights */
+  blur(2px)           /* Slight blur for grain */
+  sepia(30%);         /* Add vintage burn */
+
+For animated distortion, use keyframes:
+
+@keyframes fry {
+  0% {
+    filter: saturate(500%) contrast(200%) hue-rotate(90deg);
+  }
+  50% {
+    filter: saturate(600%) contrast(250%) hue-rotate(180deg);
+  }
+  100% {
+    filter: saturate(550%) contrast(220%) hue-rotate(270deg);
+  }
+}
+
+Apply to a pseudo-element to avoid affecting content:
+
+body::before {
+  content: '';
+  position: fixed;
+  background-image: url('image.gif');
+  filter: saturate(500%) contrast(200%);
+  animation: fry 3s infinite alternate;
+}
+
+The combination of high saturation, contrast, and rotating hues creates that
+oversaturated "meme" aesthetic.
+```
+
+### Prompt 4: Animated Text Gradients
+
+**Me:**
+```
+How do I make text with a moving rainbow gradient that loops infinitely?
+```
+
+**ChatGPT:**
+```
+Use background-clip: text to make gradients show through text:
+
+1. Create the gradient (extend it beyond 100% for smooth looping):
+   h1 {
+     background: linear-gradient(90deg,
+       #ff0000, #ff7f00, #ffff00, #00ff00,
+       #0000ff, #4b0082, #9400d3, #ff00ff,
+       #ff0000);  /* Repeat first color for seamless loop */
+     background-size: 400% 100%;
+   }
+
+2. Clip background to text only:
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   background-clip: text;
+
+3. Animate the background position:
+   animation: rainbow-gradient 2s linear infinite;
+
+   @keyframes rainbow-gradient {
+     0% { background-position: 0% 50%; }
+     100% { background-position: 100% 50%; }
+   }
+
+The 400% background-size allows the gradient to pan smoothly across the text.
+Using linear timing creates constant motion, and infinite makes it loop forever.
+```
+
+### Prompt 5: Section Oscillation
+
+**Me:**
+```
+I want different sections of my page to slide back and forth horizontally
+at different speeds. How do I do this with CSS?
+```
+
+**ChatGPT:**
+```
+Use CSS @keyframes animations with translateX:
+
+1. Create unique animations for each section:
+   @keyframes drift-home {
+     0%, 100% { transform: translateX(-5%); }
+     50% { transform: translateX(5%); }
+   }
+
+   @keyframes drift-about {
+     0%, 100% { transform: translateX(8%); }
+     50% { transform: translateX(-8%); }
+   }
+
+2. Apply with different durations and directions:
+   .section-home {
+     animation: drift-home 4s ease-in-out infinite;
+   }
+
+   .section-about {
+     animation: drift-about 3.5s ease-in-out infinite reverse;
+   }
+
+Key points:
+- ease-in-out creates smooth acceleration/deceleration
+- infinite makes it loop forever
+- reverse makes some sections move opposite directions
+- Different durations (3s, 4s, 5s) create chaotic, unsynchronized movement
+
+This creates the effect of sections "breathing" at different rates.
+```
+
+### Key Takeaways
+
+**What I learned from ChatGPT:**
+- No external parallax libraries needed - vanilla JS with requestAnimationFrame is sufficient
+- Math.sin/cos can create organic floating motion
+- CSS filters can be chained for extreme visual effects
+- background-clip: text enables gradient text
+- CSS animations are more performant than JavaScript for simple movements
+- Random values (Math.random()) add natural variation to effects
+
+**Implementation approach:**
+1. Started with basic parallax concepts from ChatGPT
+2. Iterated on the code to add multiple effect layers
+3. Combined scroll, mouse, and continuous animation
+4. Optimized with requestAnimationFrame and CSS animations
+5. Added random variations for organic feel
+
+This project demonstrates that modern web effects don't require heavy libraries -
+just understanding of core CSS and JavaScript APIs!
+
+---
+
 **Last Updated**: November 2025
-**Built with**: ❤️ and way too many CSS animations
+**Built with**: ❤️, way too many CSS animations, and helpful AI assistance
