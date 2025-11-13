@@ -1,6 +1,10 @@
 # ITPP Band Website
 
+https://aerwin-wq.github.io/
+
 A psychedelic, parallax-heavy website for the jazz fusion trio ITPP, hosted on GitHub Pages with Jekyll.
+
+
 
 ## 🚀 Hosting & Deployment
 
