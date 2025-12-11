@@ -18,19 +18,18 @@ I developed **Harmony Atlas**, a neurosymbolic AI system that computationally im
 2. Discover musical patterns using <500 universal transforms
 3. Create an interpretable, editable "gene editor" for music
 4. Generalize learned patterns across unseen files
-5. Enable style transfer and cover song detection
+5. Don't prescribe any music theory rules
+6. Enable style transfer and cover song detection
 
-### Key Accomplishments
+### Applications
+1. more efficient song editting
+2. cover song detection
+3. song similarity metrics
+4. style transfer
+5. harmonic database
+6. MIDI compression
 
-| Milestone | Result |
-|-----------|--------|
-| Pattern Discovery | 10,000+ patterns discovered via Re-Pair compression |
-| Occurrence Tracking | 2.6 million pattern occurrences mapped |
-| Reconstruction Quality | 100% lossless compression achieved |
-| Compression Ratio | 3.48x on 500-file corpus |
-| GPU Optimization | 11-18x speedup with 85-95% A100 utilization |
-| Transform Discovery | 42 MDL-optimized transforms |
-| Cross-Track Relations | 38,000+ orchestration rules discovered |
+
 
 ---
 
@@ -38,57 +37,214 @@ I developed **Harmony Atlas**, a neurosymbolic AI system that computationally im
 
 ### Theoretical Foundation
 
-The system represents music as "DNA in transform space" using 17 irreducible mathematical primitives:
+The system represents music as "DNA in transform space" using irreducible musical primitives:
 
-**Pitch Operations:**
-- Transposition (T₁-T₁₁): Shift all pitches by n semitones
-- Inversion (I₀-I₁₁): Flip pitch contour around axis
-- Retrograde (R): Reverse note sequence
+| #   | Primitive        | Range        | Count |
+|-----|------------------|--------------|-------|
+| 1   | rhythm_bucket    | 0–15         | 16    |
+| 2   | velocity_bucket  | 0–7          | 8     |
+| 3   | pitch_interval   | –127 to +127 | 255   |
+| 4   | first_pitch      | 0–127        | 128   |
 
-**Neo-Riemannian Transforms:**
-- Parallel (P): Major ↔ minor exchange
-- Leading-tone (L): Leading tone transformation
-- Relative (R): Relative major/minor exchange
+### Training Data
 
-**Temporal Operations:**
-- Time Scaling (τ): Tempo changes
-- Rhythmic Transforms: Duration ratios
+I used a corpus of 1,000 multitrack MIDI Bigband arrangements downloaded from musescore, as well as my own transcriptions transcribed using tools like basic pitch
 
-**Multitrack Operations:**
-- TrackDerive: Cross-instrument relationships
-- InstrumentFilter: Section isolation
+# Pipeline (v53)
 
-### Architecture Evolution
+## Overview
+
+This pipeline discovers musical patterns from MIDI corpora using a **pitch-agnostic contour-based approach**. Unlike earlier attempts that encoded pitch class in terminal symbols, v53 uses **TRUE pitch-agnostic normalization** where terminals contain only rhythm and velocity information. Pitch is stored per-occurrence as a transform parameter.
+
+### Core Equation
+
 ```
-Phase 1 (v6-v20): Foundation
-├── Basic primitives (T, I, R)
-├── Multi-scale pattern extraction (16, 32, 64, 128, 256 timesteps)
-└── Initial factorization (pitch × rhythm × velocity × duration)
-
-Phase 2 (v20-v30): GPU Optimization
-├── Tensorized operations on NVIDIA A100
-├── Chunked processing (8 compositions at a time)
-├── Memory reduction: 42+ GB → <4 GB
-└── General MIDI program encoding (vs track positions)
-
-Phase 3 (v31-v41): Canonical Form Architecture
-├── Patterns store canonical (T-normalized) pitches
-├── Occurrences derive absolute pitch via octave transforms
-├── Cross-track discovery ("trombone = trumpet + T(-7)")
-└── 99.9% derivation rate achieved
-
-Phase 4 (v42-v43): Primitive Completeness
-├── τ, v, d transform discovery (previously only stored)
-├── TrackDerive per-occurrence (not just summary stats)
-├── Per-piece interval magnitude discovery
-└── Feature importance for emergent "keys"
-
-Phase 5 (v53-v54): Generation Improvement
-├── Re-Pair + PPM* hybrid architecture
-├── 6-level probabilistic sampling system
-├── Per-instrument pattern vocabularies
-└── GPU-accelerated clustering for style variables
+M = Pattern(contour) × T(first_pitch)
 ```
+
+A musical passage M is represented as a contour-based pattern multiplied by a pitch transform.
+
+## Key Innovation: Pure Contour Representation
+
+| Version | Terminal Representation | Consequence |
+|---------|------------------------|-------------|
+| v50/v52 | `(pitch_class, rhythm, velocity)` | Patterns inherit pitch-class specificity |
+| **v53** | `(rhythm_bucket, velocity_bucket)` ONLY | All patterns are purely contour-based |
+
+This achieves **optimal compression** because transposed occurrences of the same melodic shape are unified into a single rule.
+
+## Pipeline Phases
+
+### Phase 1: MIDI Loading
+- Loads MIDI files from the specified corpus directory using parallel workers
+- Extracts tracks with note information (pitch, timing, velocity, duration)
+- Records GM program, drum status, and piece metadata per track
+
+### Phase 2: Pure Contour Grammar Construction
+- Uses the **Re-Pair algorithm** (GPU-accelerated) to build a hierarchical grammar
+- Terminals: `(rhythm_bucket, velocity_bucket)` pairs (N_TERMINALS = rhythm_buckets × velocity_buckets)
+- Rules capture: `(pitch_interval, rhythm_bucket, velocity_bucket)` contours
+- Stores `first_pitch` per occurrence for reconstruction
+- Hierarchical rules connect child patterns with connector intervals
+
+### Phase 3: Pattern Analysis
+- Counts total pattern occurrences across corpus
+- Identifies multi-piece patterns (patterns appearing in multiple MIDI files)
+- Tracks "merged transposition rules" - rules where the same contour appears at different absolute pitches
+
+### Phase 4: Canonical Pattern Extraction
+- Converts grammar rules to `FactoredPattern` objects
+- Prepares data structures for subsequent transform discovery phases
+
+### Phase 5: Multi-Stage Transform Discovery
+
+#### Phase 5a: MDL Transform Discovery
+- Discovers pitch transforms using Minimum Description Length principle
+- Finds transforms that explain pattern relationships efficiently
+
+#### Phase 5b: Multi-Factor Transforms (τ, v, d)
+- **τ (tau)**: Rhythm/timing transforms
+- **v**: Velocity transforms
+- **d**: Duration transforms
+- Uses MDL to justify each factor transform
+
+#### Phase 5c: TrackDerive Discovery
+- Discovers **cross-track arrangement patterns**
+- Finds how patterns relate across different instruments in the same piece
+- Records instrument relationships (e.g., "melody doubles bass an octave up")
+
+#### Phase 5d: Interval Magnitude Discovery
+- Tests whether **diatonic** or **chromatic** interval representation is better
+- Uses MDL to determine optimal representation for the corpus
+
+#### Phase 5e: Feature Importance Discovery
+- MDL-based discovery of **conditioning variables**
+- Identifies which features (instrument, position, etc.) are useful for prediction
+
+#### Phase 5g: Octave Equivalence Discovery
+- Tests whether octave equivalence is beneficial for the corpus
+- If yes, intervals ±12 are treated as equivalent, saving bits
+
+### Phase 6: Level 3 Meta-Pattern Discovery
+- **Horizontal patterns**: Sequences of transforms that repeat (e.g., I→IV→V→I progressions)
+- **Orchestration rules**: Vertical slices showing which instruments play together
+- Uses GPU Re-Pair on transform sequences
+
+### Phase 7: Checkpoint Saving
+- Saves compressed `.npz` file with grammar tensors
+- Exports JSON files for patterns, transforms, and metadata
+
+## Output Files
+
+Given `--output checkpoint.npz`, the pipeline produces:
+
+| File | Contents |
+|------|----------|
+| `checkpoint.npz` | Main checkpoint with grammar tensors |
+| `checkpoint_patterns.json` | Pattern rules with occurrences |
+| `checkpoint_transforms.json` | Pitch transform vocabulary |
+| `checkpoint_multi_factor.json` | τ/v/d transforms |
+| `checkpoint_track_derives.json` | Cross-track derivations |
+| `checkpoint_feature_importance.json` | MDL-useful conditioning features |
+| `checkpoint_meta.json` | Level 3 meta-patterns and orchestration |
+
+## Usage
+
+```bash
+python scripts/run_pure_contour_pipeline_v53_backup.py /path/to/midi/corpus \
+    --output checkpoint_v53.npz \
+    --max-files 100 \
+    --max-rules 5000 \
+    --min-count 2 \
+    --device cuda \
+    --workers 4
+```
+
+### Arguments
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `corpus_path` | (required) | Path to directory containing `.mid` files |
+| `--output`, `-o` | `checkpoint_v53_pure_contour.npz` | Output checkpoint path |
+| `--max-files` | 100 | Maximum MIDI files to process |
+| `--max-rules` | 5000 | Maximum grammar rules to discover |
+| `--min-count` | 2 | Minimum pair frequency to create rule |
+| `--device` | `cuda` | Computation device (`cuda` or `cpu`) |
+| `--workers` | 4 | Parallel workers for MIDI loading |
+
+## Dependencies
+
+### Internal Modules
+- `scripts/run_factored_pipeline.py`: FactoredTrack, pattern classes
+- `grammar/v4/repair_pure_contour.py`: GPU Re-Pair with pure contour
+- `scripts/level3_meta_patterns.py`: Meta-pattern discovery
+- `discovery/multi_factor_transforms.py`: τ/v/d transforms
+- `discovery/track_derive.py`: Cross-track derivation
+- `discovery/interval_magnitude.py`: Diatonic/chromatic selection
+- `discovery/feature_importance.py`: MDL conditioning discovery
+- `discovery/octave_equivalence.py`: Octave equivalence test
+
+### External
+- PyTorch (CUDA support recommended)
+- NumPy
+- MIDI parsing library (via `load_midi_factored`)
+
+## Data Structures
+
+### PureContourGrammar
+```python
+grammar.n_terminals      # Number of (rhythm, velocity) terminal pairs
+grammar.n_rules          # Number of discovered rules
+grammar.final_sequence   # Compressed sequence of rule IDs
+grammar.rule_contours    # (interval, rhythm_bucket, velocity_bucket) per rule
+grammar.rule_children    # (left_child, right_child) for hierarchical rules
+grammar.rule_counts      # Frequency of each rule
+grammar.rule_occurrences # {rule_id: [occurrences with first_pitch]}
+```
+
+### Rule Format (in JSON)
+```json
+{
+  "rule_id": {
+    "pitch_intervals": [2, 2, 1],
+    "canonical_pitches": [60, 62, 64, 65],
+    "rhythm_bucket": 3,
+    "velocity_bucket": 2,
+    "count": 47,
+    "is_hierarchical": false,
+    "is_pure_contour": true,
+    "occurrences": [
+      {
+        "piece_id": "song_001",
+        "track_id": 0,
+        "first_pitch": 60,
+        "onset_time": 1920,
+        "gm_program": 0,
+        "is_drum": false
+      }
+    ]
+  }
+}
+```
+
+## Performance Notes
+
+- GPU acceleration (CUDA) provides ~10-50x speedup for grammar construction
+- Multi-worker MIDI loading parallelizes I/O-bound file parsing
+- Memory usage scales with corpus size and `max_rules`
+- Typical runtime: 1-5 minutes for 100 MIDI files on GPU
+
+## Comparison with Earlier Versions
+
+| Aspect | v50/v52 | v53 |
+|--------|---------|-----|
+| Terminal encoding | pitch_class included | rhythm + velocity only |
+| Transposition handling | Separate rules per key | Unified via first_pitch |
+| Compression ratio | Good | Optimal |
+| Pattern reuse | Within pitch class | Across all pitches |
+
+
+
 
 ### Algorithm Details
 
@@ -115,7 +271,7 @@ Phase 5 (v53-v54): Generation Improvement
 
 ---
 
-## Problems I Faced (ABDYDB: Always Be Documenting Your Debugging!)
+## Problems I Faced (ABDYDB)
 
 ### Problem 1: GPU Memory Overflow (42+ GB)
 
@@ -263,7 +419,7 @@ for i, (track_id, track) in enumerate(valid_tracks):
 |---------|------------------|-------------|
 | GPU Memory Overflow | Chunked processing, incremental error computation | ~4 hours |
 | FISTA Gradient Error | Systematic debugging, sign correction | ~2 hours |
-| Low GPU Utilization | 3-level optimization (reuse, dispatch, batching) | ~8 hours |
+| Low GPU Utilization | 3-level optimization (reuse, dispatch, batching) | ~2 hours |
 | FAISS Version Mismatch | Research, conda environment setup | ~3 hours |
 | Generation Quality | Deep research into compression-based generation, PPM* implementation | ~2 weeks |
 | Track Mapping | Careful code review, adding gm_program storage | ~2 hours |
@@ -370,10 +526,6 @@ Claude helped verify my implementation matched Lewinian theory:
 
 **My Understanding:** It's crucial to periodically check that implementation details align with theoretical foundations, especially when making optimizations.
 
-### Screenshots of AI Interactions
-
-*Note: As this is a markdown document, screenshots would be included as images in the final submission. Key conversations documented in this project include:*
-
 1. GPU Memory Debugging Session (Nov 23, 2025)
 2. FISTA Algorithm Verification (Nov 25, 2025)
 3. Generation Architecture Research (Dec 7-10, 2025)
@@ -413,7 +565,7 @@ python scripts/run_pure_contour_pipeline.py /path/to/midi_corpus \
     --output checkpoint_v54.npz \
     --max-files 1000 \
     --max-rules 10000 \
-    --top-instruments 15
+
 
 # Generation (after training)
 python scripts/generate_music.py checkpoint_v54.npz \
@@ -438,6 +590,7 @@ python scripts/generate_music.py checkpoint_v54.npz \
 - David Lewin for Generalized Musical Intervals and Transformations theory
 - Anthropic's Claude for extensive debugging and architecture guidance
 - The FAISS team at Facebook Research for similarity search infrastructure
+- David Cope's EMI, a similar philosophy and system
 - PyTorch developers for GPU tensor operations
 
 ---
