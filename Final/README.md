@@ -61,7 +61,6 @@ This pipeline discovers musical patterns from MIDI corpora using **pitch-agnosti
 
 
 
-A musical passage M is represented as a contour-based pattern multiplied by a pitch transform.
 
 ## Pure Contour Representation
 
