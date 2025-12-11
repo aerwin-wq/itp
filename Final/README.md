@@ -14,12 +14,12 @@
 I developed **Harmony Atlas**, a neurosymbolic AI system that computationally implements David Lewin's transformational music theory for MIDI analysis and generation. The core philosophy is "discovery not prescription" — using compression algorithms to discover musical relationships rather than hardcoding music theory rules.
 
 ### Project Goals
-1. Achieve 97-100% lossless MIDI reconstruction
+1. Achieve 97-100% lossless MIDI compression and reconstruction
 2. Discover musical patterns using <500 universal transforms
 3. Create an interpretable, editable "gene editor" for music
-4. Generalize learned patterns across unseen files
-5. Don't prescribe any music theory rules
-6. Enable style transfer and cover song detection
+5. Generalize learned patterns across unseen files
+6. Don't prescribe any music theory rules
+7. Enable style transfer and cover song detection
 
 ### Applications
 1. more efficient song editting
@@ -546,6 +546,20 @@ Claude helped verify my implementation matched Lewinian theory:
 | v54 | Dec 10 | Per-instrument vocabularies, PPM* | 🔧 In Progress |
 
 ---
+
+v53
+Notes:           4,273,245
+Patterns stored: 10,000
+Encoded tokens:  ~1,607,000 (4.27M / 2.66)
+
+Storage needed:
+  Grammar:  10,000 patterns × ~50 bytes = ~500 KB
+  Encoded:  1,607,000 tokens × 2 bytes  = ~3.2 MB
+  Total:    ~3.7 MB
+
+Original (raw notes): 4,273,245 × 8 bytes = ~34 MB
+
+TRUE COMPRESSION: 34 MB / 3.7 MB = ~9.2x
 
 ## Running the Code
 
