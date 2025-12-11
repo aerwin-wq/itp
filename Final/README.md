@@ -549,20 +549,17 @@ Claude helped verify my implementation matched Lewinian theory:
 
 ## v53 Compression Stats
 
-**Notes:** 4,273,245  
-**Patterns stored:** 10,000  
-**Encoded tokens:** ~1,607,000 (4.27M / 2.66)
+| Metric                 | Value                              |
+|------------------------|-------------------------------------|
+| **Notes**              | 4,273,245                           |
+| **Patterns stored**    | 10,000                              |
+| **Encoded tokens**     | ~1,607,000 (4.27M / 2.66)           |
+| **Grammar storage**    | 10,000 × ~50 bytes ≈ **500 KB**     |
+| **Encoded storage**    | 1,607,000 × 2 bytes ≈ **3.2 MB**    |
+| **Total storage**      | **~3.7 MB**                         |
+| **Original size**      | 4,273,245 × 8 bytes ≈ **34 MB**     |
+| **Compression ratio**  | **~9.2×**                           |
 
-### Storage Needed
-- **Grammar:** 10,000 patterns × ~50 bytes = **~500 KB**  
-- **Encoded stream:** 1,607,000 tokens × 2 bytes = **~3.2 MB**  
-- **Total:** **~3.7 MB**
-
-### Original Size
-- Raw notes: 4,273,245 × 8 bytes = **~34 MB**
-
-### **True Compression Ratio**
-**34 MB → 3.7 MB = ~9.2× compression**
 
 
 ## Running the Code
