@@ -54,17 +54,16 @@ I used a corpus of 1,000 multitrack MIDI Bigband arrangements downloaded from mu
 
 ## Overview
 
-This pipeline discovers musical patterns from MIDI corpora using a **pitch-agnostic contour-based approach**. Unlike earlier attempts that encoded pitch class in terminal symbols, v53 uses **TRUE pitch-agnostic normalization** where terminals contain only rhythm and velocity information. Pitch is stored per-occurrence as a transform parameter.
+This pipeline discovers musical patterns from MIDI corpora using **pitch-agnostic Grammar-based compression** Unlike earlier attempts that encoded pitch class in terminal symbols, v53 uses **TRUE pitch-agnostic normalization** where terminals contain only rhythm and velocity information. Pitch is stored per-occurrence as a transform parameter.
 
-### Core Equation
+## Re-Pair (short for recursive pairing) 
+![Re_pair_example](https://github.com/user-attachments/assets/60c84245-b40d-4f3b-af81-35b4ebf5d0c3)
 
-```
-M = Pattern(contour) × T(first_pitch)
-```
+
 
 A musical passage M is represented as a contour-based pattern multiplied by a pitch transform.
 
-## Key Innovation: Pure Contour Representation
+## Pure Contour Representation
 
 | Version | Terminal Representation | Consequence |
 |---------|------------------------|-------------|
